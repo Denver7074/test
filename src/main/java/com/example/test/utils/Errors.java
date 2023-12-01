@@ -12,7 +12,7 @@ import static org.apache.commons.lang3.ObjectUtils.anyNotNull;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public enum Errors {
 
-    E001("Текстовая строка не введена");
+    E001("Параметр 'text' не может быть пустым");
 
     String description;
 

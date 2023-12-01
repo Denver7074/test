@@ -6,9 +6,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Data;
 import lombok.experimental.FieldNameConstants;
-import org.springframework.data.annotation.CreatedDate;
-
-import java.time.LocalDateTime;
 
 @Data
 @MappedSuperclass
