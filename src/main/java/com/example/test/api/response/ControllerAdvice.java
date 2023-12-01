@@ -1,25 +1,27 @@
 package com.example.test.api.response;
 
-import com.example.test.utils.Error;
+import com.example.test.utils.Errors;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
-import static com.example.test.utils.Error.E001;
+import java.util.Objects;
+
+import static com.example.test.utils.Errors.E001;
 
 
 @RestControllerAdvice
 public class ControllerAdvice {
 
-
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(MissingServletRequestParameterException.class)
-    public Object handleException(MissingServletRequestParameterException ex) {
-        return ResponseApi.negativeResponse(E001.name(),
-                String.format(E001.getDescription(), ex.getParameterName()),
-                ExceptionUtils.getStackTrace(ex));
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public Object handleException(HandlerMethodValidationException t) {
+        return ResponseApi.negativeResponse(E001.name(), E001.getDescription(),
+                ExceptionUtils.getStackTrace(t));
     }
 }
