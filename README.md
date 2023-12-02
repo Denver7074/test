@@ -19,6 +19,7 @@
 - Spring Boot 3.2.0
 - PostgreSQL 15-alpine
 - Docker 24.0.6
+- Сборщик проектов Gradle
 ## Развертывание PostgreSQL с помощью Docker Compose
 
 Это приложение использует Docker Compose для удобного развертывания и работы с базой данных. Вот пример файла `docker-compose.yml`:
@@ -239,5 +240,16 @@ http://localhost:8080/swagger-ui/index.html#/
 				assertThat(results.get(i).elements().next().intValue() >= results.get(i + 1).elements().next().intValue());
 			}
 		}
+	}
+```
+2. Проверяем выбрасывание ошибки если база данных пустая
+```java
+   public void getWhenEmpty() throws Exception {
+
+		when(rep.findAll()).thenReturn(Collections.emptyList());
+
+		mockMvc.perform(get(""))
+				.andExpect(status().isNotFound())
+				.andExpect(jsonPath("$.details").value("В базе данных пока ничего нет"));
 	}
 ```
