@@ -101,16 +101,13 @@ curl --location 'http://localhost:8080?text=dsfsffdf&number=2' \
         "text": "апраррпар",
         "results": [
             {
-                "key": "р",
-                "value": 4
+                "р": 4
             },
             {
-                "key": "а",
-                "value": 3
+                "а": 3
             },
             {
-                "key": "п",
-                "value": 2
+                "п": 2
             }
         ]
     }
@@ -132,26 +129,22 @@ curl --location 'http://localhost:8080'
 ```  
 Пример ответа:
 ```json
-{
-    "isFinish": true,
-    "data": {
+[
+    {
         "text": "апраррпар",
         "results": [
             {
-                "key": "р",
-                "value": 4
+                "р": 4
             },
             {
-                "key": "а",
-                "value": 3
+                "а": 3
             },
             {
-                "key": "п",
-                "value": 2
+                "п": 2
             }
         ]
     }
-}
+]
 ```
 ## Swagger
 ```bash
@@ -175,7 +168,7 @@ http://localhost:8080/swagger-ui/index.html#/
 		ArrayNode results = getResult(randomText());
 
 		for (int i = 0; i < results.size() - 1; i++) {
-			assertThat(results.get(i).get("value").intValue() >= results.get(i + 1).get("value").intValue());
+			assertThat(results.get(i).elements().next().intValue() >= results.get(i + 1).elements().next().intValue());
 		}
 	}
 
@@ -207,17 +200,17 @@ http://localhost:8080/swagger-ui/index.html#/
 		ArrayNode results = getResult("aaaabbbccd");
 		assertThat(results).hasSize(4);
 
-		assertThat(results.get(0).get("key").textValue()).isEqualTo("a");
-		assertThat(results.get(0).get("value").intValue()).isEqualTo(4);
+		assertThat(results.get(0).fields().next().getKey()).isEqualTo("a");
+		assertThat(results.get(0).elements().next().asInt()).isEqualTo(4);
 
-		assertThat(results.get(1).get("key").textValue()).isEqualTo("b");
-		assertThat(results.get(1).get("value").intValue()).isEqualTo(3);
+		assertThat(results.get(1).fields().next().getKey()).isEqualTo("b");
+		assertThat(results.get(1).elements().next().asInt()).isEqualTo(3);
 
-		assertThat(results.get(2).get("key").textValue()).isEqualTo("c");
-		assertThat(results.get(2).get("value").intValue()).isEqualTo(2);
+		assertThat(results.get(2).fields().next().getKey()).isEqualTo("c");
+		assertThat(results.get(2).elements().next().asInt()).isEqualTo(2);
 
-		assertThat(results.get(3).get("key").textValue()).isEqualTo("d");
-		assertThat(results.get(3).get("value").intValue()).isEqualTo(1);
+		assertThat(results.get(3).fields().next().getKey()).isEqualTo("d");
+		assertThat(results.get(3).elements().next().asInt()).isEqualTo(1);
 	}
 
 	private ArrayNode getResult(String text) throws Exception {
@@ -243,7 +236,7 @@ http://localhost:8080/swagger-ui/index.html#/
 		for (JsonNode j : jsonNode) {
 			ArrayNode results = (ArrayNode) j.get("results");
 			for (int i = 0; i < results.size() - 1; i++) {
-				assertThat(results.get(i).get("value").intValue() >= results.get(i + 1).get("value").intValue());
+				assertThat(results.get(i).elements().next().intValue() >= results.get(i + 1).elements().next().intValue());
 			}
 		}
 	}
