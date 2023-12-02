@@ -12,7 +12,8 @@ import static org.apache.commons.lang3.ObjectUtils.anyNotNull;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public enum Errors {
 
-    E001("Параметр 'text' не может быть пустым");
+    E001("Параметр 'text' не может быть пустым"),
+    E002("В базе данных пока ничего нет");
 
     String description;
 

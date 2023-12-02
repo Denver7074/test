@@ -1,5 +1,6 @@
 package com.example.test;
 
+import com.example.test.rep.ResponseRep;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -7,12 +8,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.util.Collections;
 import java.util.Random;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -25,6 +29,9 @@ class TestApplicationTests {
 
 	@Autowired
 	private MockMvc mockMvc;
+
+	@MockBean
+	private ResponseRep rep;
 
 	@Test
 	public void testCountFrequencyConcurrentWithEmptyText() throws Exception {
@@ -45,7 +52,7 @@ class TestApplicationTests {
 		for (JsonNode j : jsonNode) {
 			ArrayNode results = (ArrayNode) j.get("results");
 			for (int i = 0; i < results.size() - 1; i++) {
-				assertThat(results.get(i).get("value").intValue() >= results.get(i + 1).get("value").intValue());
+				assertThat(results.get(i).elements().next().intValue() >= results.get(i + 1).elements().next().intValue());
 			}
 		}
 	}
@@ -55,24 +62,24 @@ class TestApplicationTests {
 		ArrayNode results = getResult("aaaabbbccd");
 		assertThat(results).hasSize(4);
 
-		assertThat(results.get(0).get("key").textValue()).isEqualTo("a");
-		assertThat(results.get(0).get("value").intValue()).isEqualTo(4);
+		assertThat(results.get(0).fields().next().getKey()).isEqualTo("a");
+		assertThat(results.get(0).elements().next().asInt()).isEqualTo(4);
 
-		assertThat(results.get(1).get("key").textValue()).isEqualTo("b");
-		assertThat(results.get(1).get("value").intValue()).isEqualTo(3);
+		assertThat(results.get(1).fields().next().getKey()).isEqualTo("b");
+		assertThat(results.get(1).elements().next().asInt()).isEqualTo(3);
 
-		assertThat(results.get(2).get("key").textValue()).isEqualTo("c");
-		assertThat(results.get(2).get("value").intValue()).isEqualTo(2);
+		assertThat(results.get(2).fields().next().getKey()).isEqualTo("c");
+		assertThat(results.get(2).elements().next().asInt()).isEqualTo(2);
 
-		assertThat(results.get(3).get("key").textValue()).isEqualTo("d");
-		assertThat(results.get(3).get("value").intValue()).isEqualTo(1);
+		assertThat(results.get(3).fields().next().getKey()).isEqualTo("d");
+		assertThat(results.get(3).elements().next().asInt()).isEqualTo(1);
 	}
 	@Test
 	public void testCountFrequencyConcurrentWithText() throws Exception {
 		ArrayNode results = getResult(randomText());
 
 		for (int i = 0; i < results.size() - 1; i++) {
-			assertThat(results.get(i).get("value").intValue() >= results.get(i + 1).get("value").intValue());
+			assertThat(results.get(i).elements().next().intValue() >= results.get(i + 1).elements().next().intValue());
 		}
 	}
 
@@ -87,7 +94,6 @@ class TestApplicationTests {
 		return text.toString();
 	}
 
-
 	private ArrayNode getResult(String text) throws Exception {
 		MvcResult result = mockMvc.perform(post("")
 						.param("text", text)
@@ -97,6 +103,16 @@ class TestApplicationTests {
 		String responseBody = result.getResponse().getContentAsString();
 		JsonNode jsonNode = new ObjectMapper().readTree(responseBody);
 		return  (ArrayNode) jsonNode.get("data").get("results");
+	}
+
+	@Test
+	public void getWhenEmpty() throws Exception {
+
+		when(rep.findAll()).thenReturn(Collections.emptyList());
+
+		mockMvc.perform(get(""))
+				.andExpect(status().isNotFound())
+				.andExpect(jsonPath("$.details").value("В базе данных пока ничего нет"));
 	}
 
 }

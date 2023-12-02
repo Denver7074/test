@@ -18,7 +18,9 @@ import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 public class Logging {
 
     @SneakyThrows
-    @Around("execution(* com.example.test.service.*.*(..)) || @annotation(ToLog)")
+    @Around("execution(* com.example.test.service.*.*(..)) ||" +
+            "execution(* com.example.test.api.response.ControllerAdvice.*(..)) ||" +
+            " @annotation(ToLog)")
     public Object logging(ProceedingJoinPoint joinPoint) {
         String nameClass = joinPoint.getSignature().getDeclaringType().getName();
         String methodName = joinPoint.getSignature().getName();
